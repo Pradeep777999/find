@@ -1,21 +1,20 @@
-// ================= AUTO DETECT LANGUAGE (FIRST TIME ONLY) =================
+// ================= AUTO DETECT LANGUAGE =================
 
-(function(){
+(function () {
 
-  if(!localStorage.getItem("lang")){
+  if (!localStorage.getItem("lang")) {
 
-    const userLang = navigator.language || navigator.userLanguage;
+    const userLang = navigator.language || navigator.userLanguage || "en";
 
-    if(userLang.includes("te")){
+    if (userLang.toLowerCase().startsWith("te")) {
       localStorage.setItem("lang", "te");
-    } 
-    else if(userLang.includes("hi")){
+    }
+    else if (userLang.toLowerCase().startsWith("hi")) {
       localStorage.setItem("lang", "hi");
-    } 
-    else{
+    }
+    else {
       localStorage.setItem("lang", "en");
     }
-
   }
 
 })();
@@ -25,56 +24,83 @@
 
 function googleTranslateElementInit() {
 
-  new google.translate.TranslateElement({
-    pageLanguage: 'en',
-    includedLanguages: 'en,te,hi',
-    layout: google.translate.TranslateElement.InlineLayout.SIMPLE
-  }, 'google_translate_element');
+  new google.translate.TranslateElement(
+    {
+      pageLanguage: "en",
+      includedLanguages: "en,te,hi",
+      autoDisplay: false,
+      layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+    },
+    "google_translate_element"
+  );
 
-  applySavedLanguage();
+  waitForGoogleTranslate();
+}
+
+
+// ================= WAIT FOR GOOGLE TRANSLATE =================
+
+function waitForGoogleTranslate() {
+
+  let attempts = 0;
+
+  const interval = setInterval(function () {
+
+    const combo = document.querySelector(".goog-te-combo");
+
+    if (combo) {
+
+      clearInterval(interval);
+
+      applySavedLanguage(combo);
+    }
+
+    attempts++;
+
+    // Stop after about 15 seconds
+    if (attempts > 50) {
+      clearInterval(interval);
+    }
+
+  }, 300);
 }
 
 
 // ================= APPLY SAVED LANGUAGE =================
 
-function applySavedLanguage(){
+function applySavedLanguage(combo) {
 
   const savedLang = localStorage.getItem("lang");
 
-  if(!savedLang) return;
+  if (!savedLang || savedLang === "en") {
+    return;
+  }
 
-  let applied = false;
+  combo.value = savedLang;
 
-  const interval = setInterval(() => {
-
-    const combo = document.querySelector(".goog-te-combo");
-
-    if(combo && !applied){
-
-      combo.value = savedLang;
-      combo.dispatchEvent(new Event("change"));
-
-      applied = true;
-      clearInterval(interval);
-
-      // Show page after translation applied
-      document.body.style.opacity = "1";
-    }
-
-  }, 300);
-
+  combo.dispatchEvent(new Event("change", {
+    bubbles: true
+  }));
 }
 
 
-// ================= SAVE LANGUAGE ON CHANGE =================
+// ================= SAVE LANGUAGE =================
 
-document.addEventListener("change", function(e){
+document.addEventListener("change", function (event) {
 
-  if(e.target.className === "goog-te-combo"){
+  const target = event.target;
 
-    const selectedLang = e.target.value;
-    localStorage.setItem("lang", selectedLang);
+  if (
+    target &&
+    target.classList &&
+    target.classList.contains("goog-te-combo")
+  ) {
 
+    const selectedLang = target.value;
+
+    if (selectedLang) {
+      localStorage.setItem("lang", selectedLang);
+    }
   }
 
 });
