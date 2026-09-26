@@ -86,11 +86,6 @@
     // Setup Google Translate responsive position
     repositionTranslateWidget();
     window.addEventListener('resize', repositionTranslateWidget);
-
-    // Apply initial dark theme setting
-    if (localStorage.getItem('dark-mode') === 'enabled') {
-      document.body.classList.add('dark-theme');
-    }
   }
 
   // Ensure drawer elements are appended to body
@@ -105,28 +100,30 @@
                 <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" fill="white"/>
               </svg>
             </button>
+
             <img src="/images/findback.png" class="m-header-logo" alt="MITS Logo">
             <h2 class="m-header-title">FindMyThing</h2>
             <p class="m-header-subtitle">Campus Lost & Found Portal</p>
           </div>
-          
+
           <div class="drawer-body">
             <!-- Profile Section -->
             <div id="m-drawer-profile" class="m-profile-section"></div>
-            
-            <!-- Menu Items Container (White/Glass Card) -->
+
+            <!-- Menu Items Container -->
             <div class="m-menu-card">
               <div id="drawerNavLinksContainer" style="display: flex; flex-direction: column;">
                 <!-- Links injected here -->
               </div>
             </div>
-            
+
             <!-- Bottom Section -->
             <div class="m-drawer-bottom">
               <div class="m-bottom-info">
                 <span class="m-version">FindMyThing v1.0</span>
                 <img src="/images/findback.png" class="m-bottom-logo" alt="MITS Logo">
               </div>
+
               <div class="m-bottom-links">
                 <a href="#">Privacy Policy</a>
                 <span class="m-dot">•</span>
@@ -136,6 +133,7 @@
           </div>
         </div>
       `;
+
       document.body.insertAdjacentHTML('beforeend', drawerHTML);
     }
 
@@ -155,6 +153,7 @@
         } else {
           currentUser = null;
         }
+
         renderLinks();
       })
       .catch(err => {
@@ -167,7 +166,7 @@
   // Render navigation links dynamically
   function renderLinks() {
     const currentPath = window.location.pathname;
-    
+
     // Check if active page
     const isHome = currentPath === '/' || currentPath === '/index.html' || currentPath.endsWith('/');
     const isItems = currentPath.includes('/items.html');
@@ -188,26 +187,62 @@
     ];
 
     if (currentUser) {
-      pages.push({ name: 'My Items', href: '/my-items.html', active: isMyItems, icon: '👤' });
-      pages.push({ name: 'Report Lost', href: '/report-lost.html', active: isReportLost, icon: '😞' });
-      pages.push({ name: 'Report Found', href: '/report-found.html', active: isReportFound, icon: '😀' });
+      pages.push({
+        name: 'My Items',
+        href: '/my-items.html',
+        active: isMyItems,
+        icon: '👤'
+      });
+
+      pages.push({
+        name: 'Report Lost',
+        href: '/report-lost.html',
+        active: isReportLost,
+        icon: '😞'
+      });
+
+      pages.push({
+        name: 'Report Found',
+        href: '/report-found.html',
+        active: isReportFound,
+        icon: '😀'
+      });
     }
 
     // Role-based links
     const privilegedLinks = [];
+
     if (currentUser) {
       if (currentUser.role === 'admin' || currentUser.role === 'manager') {
-        privilegedLinks.push({ name: 'Manager Panel', href: '/manager.html', active: isManager, icon: '👨‍💼' });
-        privilegedLinks.push({ name: 'Analytics', href: '/analytics.html', active: isAnalytics, icon: '📊' });
+        privilegedLinks.push({
+          name: 'Manager Panel',
+          href: '/manager.html',
+          active: isManager,
+          icon: '👨‍💼'
+        });
+
+        privilegedLinks.push({
+          name: 'Analytics',
+          href: '/analytics.html',
+          active: isAnalytics,
+          icon: '📊'
+        });
       }
+
       if (currentUser.role === 'admin') {
-        privilegedLinks.push({ name: 'Admin Panel', href: '/admin.html', active: isAdmin, icon: '⚙️' });
+        privilegedLinks.push({
+          name: 'Admin Panel',
+          href: '/admin.html',
+          active: isAdmin,
+          icon: '⚙️'
+        });
       }
     }
 
     // --- RENDER DESKTOP ---
     const desktopContainer = document.getElementById('desktopNavLinksContainer');
     const welcomeUserEl = document.getElementById('welcomeUser');
+
     desktopContainer.innerHTML = '';
 
     if (currentUser) {
@@ -220,7 +255,9 @@
         const a = document.createElement('a');
         a.href = p.href;
         a.innerText = p.name;
-        if (p.active) a.className = 'active';
+        if (p.active) {
+          a.className = 'active';
+        }
         desktopContainer.appendChild(a);
       });
 
@@ -248,15 +285,19 @@
         const a = document.createElement('a');
         a.href = p.href;
         a.innerText = p.name;
-        if (p.active) a.className = 'active';
+        if (p.active) {
+          a.className = 'active';
+        }
         desktopContainer.appendChild(a);
       });
 
+      // Login
       const loginBtn = document.createElement('a');
       loginBtn.href = '/login.html';
       loginBtn.innerText = 'Login';
       desktopContainer.appendChild(loginBtn);
 
+      // Register
       const registerBtn = document.createElement('a');
       registerBtn.href = '/register.html';
       registerBtn.innerText = 'Register';
@@ -266,14 +307,22 @@
 
     // Render Role Badge next to Logo if on my-items page and logged in
     const existingBadge = document.querySelector('.nav-role-badge');
-    if (existingBadge) existingBadge.remove();
-    
+    if (existingBadge) {
+      existingBadge.remove();
+    }
+
     if (currentUser && (isMyItems || isAdmin || isManager)) {
       const brandContainer = document.querySelector('#mainNavbar .nav-brand');
       if (brandContainer) {
         const badge = document.createElement('div');
         badge.className = 'nav-role-badge';
-        const roleText = currentUser.role === 'admin' ? 'Admin' : currentUser.role === 'manager' ? 'Manager' : 'Student/Staff';
+        const roleText =
+          currentUser.role === 'admin'
+            ? 'Admin'
+            : currentUser.role === 'manager'
+              ? 'Manager'
+              : 'Student/Staff';
+
         badge.innerHTML = `<span class="rbadge-dot"></span>${roleText}`;
         brandContainer.appendChild(badge);
       }
@@ -282,23 +331,34 @@
     // --- RENDER MOBILE DRAWER ---
     const drawerContainer = document.getElementById('drawerNavLinksContainer');
     const profileEl = document.getElementById('m-drawer-profile');
+
     drawerContainer.innerHTML = '';
 
     if (currentUser) {
       const initials = currentUser.name
-        ? currentUser.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
+        ? currentUser.name
+            .split(' ')
+            .map(n => n[0])
+            .join('')
+            .substring(0, 2)
+            .toUpperCase()
         : 'U';
+
       let email = 'student@mits.ac.in';
       if (currentUser.name) {
         let nameParts = currentUser.name.toLowerCase().split(' ');
-        let username = nameParts.filter(p => p.length > 0).join('.');
+        let username = nameParts
+          .filter(p => p.length > 0)
+          .join('.');
         email = `${username}@mits.ac.in`;
       }
+
       profileEl.innerHTML = `
         <div class="m-profile-avatar user">
           <span class="m-avatar-initials">${initials}</span>
           <span class="m-online-indicator"></span>
         </div>
+
         <div class="m-profile-info">
           <div class="m-profile-welcome">Welcome</div>
           <div class="m-profile-name">${currentUser.name}</div>
@@ -311,7 +371,7 @@
         const a = document.createElement('a');
         a.href = p.href;
         a.className = p.active ? 'drawer-link active' : 'drawer-link';
-        a.innerHTML = `<span class="icon">${p.icon}</span> ${p.name}`;
+        a.innerHTML = `<span class="icon">${p.icon}</span>${p.name}`;
         drawerContainer.appendChild(a);
       });
 
@@ -320,20 +380,26 @@
         const a = document.createElement('a');
         a.href = p.href;
         a.className = p.active ? 'drawer-link active' : 'drawer-link';
-        a.innerHTML = `<span class="icon">${p.icon}</span> ${p.name}`;
+        a.innerHTML = `<span class="icon">${p.icon}</span>${p.name}`;
         drawerContainer.appendChild(a);
       });
+
     } else {
       profileEl.innerHTML = `
         <div class="m-profile-avatar guest">
           <svg viewBox="0 0 24 24" width="24" height="24">
-            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="#cbd5e1"/>
+            <path
+              d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+              fill="#cbd5e1"
+            />
           </svg>
         </div>
+
         <div class="m-profile-info">
           <div class="m-profile-welcome">Welcome</div>
           <div class="m-profile-name">Guest User</div>
         </div>
+
         <div class="m-profile-actions">
           <a href="/login.html" class="m-profile-btn login">Login</a>
           <a href="/register.html" class="m-profile-btn register">Register</a>
@@ -345,25 +411,26 @@
         const a = document.createElement('a');
         a.href = p.href;
         a.className = p.active ? 'drawer-link active' : 'drawer-link';
-        a.innerHTML = `<span class="icon">${p.icon}</span> ${p.name}`;
+        a.innerHTML = `<span class="icon">${p.icon}</span>${p.name}`;
         drawerContainer.appendChild(a);
       });
 
-      // Render Login & Register links in list
+      // Login link
       const aLogin = document.createElement('a');
       aLogin.href = '/login.html';
       aLogin.className = currentPath.includes('/login.html') ? 'drawer-link active' : 'drawer-link';
-      aLogin.innerHTML = `<span class="icon">🔐</span> Login`;
+      aLogin.innerHTML = `<span class="icon">🔐</span>Login`;
       drawerContainer.appendChild(aLogin);
 
+      // Register link
       const aRegister = document.createElement('a');
       aRegister.href = '/register.html';
       aRegister.className = currentPath.includes('/register.html') ? 'drawer-link active' : 'drawer-link';
-      aRegister.innerHTML = `<span class="icon">📝</span> Register`;
+      aRegister.innerHTML = `<span class="icon">📝</span>Register`;
       drawerContainer.appendChild(aRegister);
     }
 
-    // Google Translate / Language link inside drawer links
+    // Google Translate / Language link
     const aLang = document.createElement('div');
     aLang.className = 'drawer-link m-lang-item';
     aLang.innerHTML = `
@@ -374,63 +441,13 @@
     `;
     drawerContainer.appendChild(aLang);
 
-    // Help link
-    const aHelp = document.createElement('a');
-    aHelp.href = '/#notice';
-    aHelp.className = 'drawer-link';
-    aHelp.innerHTML = `<span class="icon">❓</span> Help`;
-    drawerContainer.appendChild(aHelp);
-
-    // Contact link
-    const aContact = document.createElement('a');
-    aContact.href = 'tel:9160482396';
-    aContact.className = 'drawer-link';
-    aContact.innerHTML = `<span class="icon">📞</span> Contact`;
-    drawerContainer.appendChild(aContact);
-
-    // Dark Mode link
-    const aDarkMode = document.createElement('a');
-    aDarkMode.href = '#';
-    aDarkMode.className = 'drawer-link m-dark-toggle';
-    aDarkMode.id = 'drawerDarkMode';
-    aDarkMode.innerHTML = `
-      <span style="display:flex; align-items:center; gap:14px;">
-        <span class="icon">🌙</span> Dark Mode
-      </span>
-      <span class="m-toggle-switch"><span class="m-toggle-knob"></span></span>
-    `;
-    drawerContainer.appendChild(aDarkMode);
-
-    // Dark mode listener hook
-    aDarkMode.addEventListener('click', function(e) {
-      e.preventDefault();
-      const body = document.body;
-      const isDark = body.classList.toggle('dark-theme');
-      localStorage.setItem('dark-mode', isDark ? 'enabled' : 'disabled');
-      updateDarkModeToggleUI();
-    });
-
-    updateDarkModeToggleUI();
-
     // Render Logout at the very bottom of the card if logged in
     if (currentUser) {
       const aLogout = document.createElement('a');
       aLogout.href = '/logout';
       aLogout.className = 'drawer-link';
-      aLogout.innerHTML = `<span class="icon">🚪</span> Logout`;
+      aLogout.innerHTML = `<span class="icon">🚪</span>Logout`;
       drawerContainer.appendChild(aLogout);
-    }
-  }
-
-  // Dark Mode Switch UI Helper
-  function updateDarkModeToggleUI() {
-    const switchEl = document.querySelector('#drawerDarkMode .m-toggle-switch');
-    if (switchEl) {
-      if (document.body.classList.contains('dark-theme')) {
-        switchEl.classList.add('active');
-      } else {
-        switchEl.classList.remove('active');
-      }
     }
   }
 
@@ -458,41 +475,58 @@
 
     // ESC key closes drawer
     window.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && mobileDrawer.classList.contains('active')) {
+      if (
+        e.key === 'Escape' &&
+        mobileDrawer.classList.contains('active')
+      ) {
         closeDrawer();
       }
     });
 
-    // Touch Swipe to Close Drawer (swipe right)
+    // Touch Swipe to Close Drawer
     let touchStartX = 0;
-    mobileDrawer.addEventListener('touchstart', function (e) {
-      touchStartX = e.changedTouches[0].screenX;
-    }, { passive: true });
 
-    mobileDrawer.addEventListener('touchend', function (e) {
-      const touchEndX = e.changedTouches[0].screenX;
-      // If swiped right by more than 50px
-      if (touchEndX - touchStartX > 50) {
-        closeDrawer();
-      }
-    }, { passive: true });
+    mobileDrawer.addEventListener(
+      'touchstart',
+      function (e) {
+        touchStartX = e.changedTouches[0].screenX;
+      },
+      { passive: true }
+    );
+
+    mobileDrawer.addEventListener(
+      'touchend',
+      function (e) {
+        const touchEndX = e.changedTouches[0].screenX;
+        // If swiped right by more than 50px
+        if (touchEndX - touchStartX > 50) {
+          closeDrawer();
+        }
+      },
+      { passive: true }
+    );
 
     // Focus Trap inside Drawer
     mobileDrawer.addEventListener('keydown', function (e) {
       if (e.key !== 'Tab') return;
-      
-      const focusables = mobileDrawer.querySelectorAll('button, a, select, [tabindex="0"]');
+
+      const focusables = mobileDrawer.querySelectorAll(
+        'button, a, select, [tabindex="0"]'
+      );
+
       if (focusables.length === 0) return;
 
       const first = focusables[0];
       const last = focusables[focusables.length - 1];
 
-      if (e.shiftKey) { // Shift + Tab
+      if (e.shiftKey) {
+        // Shift + Tab
         if (document.activeElement === first) {
           last.focus();
           e.preventDefault();
         }
-      } else { // Tab
+      } else {
+        // Tab
         if (document.activeElement === last) {
           first.focus();
           e.preventDefault();
@@ -506,13 +540,23 @@
     if (!translateElement) return;
 
     if (window.innerWidth < 992) {
-      const mobileTarget = document.getElementById('google_translate_element_mobile_target');
-      if (mobileTarget && translateElement.parentElement !== mobileTarget) {
+      const mobileTarget = document.getElementById(
+        'google_translate_element_mobile_target'
+      );
+      if (
+        mobileTarget &&
+        translateElement.parentElement !== mobileTarget
+      ) {
         mobileTarget.appendChild(translateElement);
       }
     } else {
-      const desktopTarget = document.getElementById('google_translate_element_desktop_target');
-      if (desktopTarget && translateElement.parentElement !== desktopTarget) {
+      const desktopTarget = document.getElementById(
+        'google_translate_element_desktop_target'
+      );
+      if (
+        desktopTarget &&
+        translateElement.parentElement !== desktopTarget
+      ) {
         desktopTarget.appendChild(translateElement);
       }
     }
